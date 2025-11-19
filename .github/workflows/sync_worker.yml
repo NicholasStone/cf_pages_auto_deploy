@@ -1,0 +1,49 @@
+name: Sync Worker File
+
+on:
+  schedule:
+    # 每天 UTC 时间 00:00 运行 (北京时间 08:00)
+    - cron: '0 0 * * *'
+  workflow_dispatch: # 允许手动触发
+
+permissions:
+  contents: write # 需要写入权限来提交代码
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current repository
+        uses: actions/checkout@v4
+
+      - name: Download and Sync File
+        env:
+          SOURCE_URL: ${{ secrets.SOURCE_URL }}
+        run: |
+          # ================= 配置区域 =================
+          TARGET_FILE="_workers.js"
+          # ===========================================
+
+          if [ -z "$SOURCE_URL" ]; then
+            echo "Error: SOURCE_URL secret is not set. Please add it in Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
+
+          echo "Downloading from remote source..."
+          curl -sL "$SOURCE_URL" -o "$TARGET_FILE"
+
+          # 检查文件是否有变化
+          if [[ -n $(git status -s "$TARGET_FILE") ]]; then
+            echo "Changes detected. Preparing to commit..."
+            
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            
+            git add "$TARGET_FILE"
+            git commit -m "chore: sync $TARGET_FILE from remote source [skip ci]"
+            git push
+            
+            echo "Successfully synced and pushed changes."
+          else
+            echo "No changes detected. Skipping commit."
+          fi
