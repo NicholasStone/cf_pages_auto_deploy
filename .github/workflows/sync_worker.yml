@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write # 需要写入权限来提交代码
+  pull-requests: write
 
 jobs:
   sync:
@@ -19,6 +20,7 @@ jobs:
       - name: Download and Sync File
         env:
           SOURCE_URL: ${{ secrets.SOURCE_URL }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # ================= 配置区域 =================
           TARGET_FILE="_worker.js"
@@ -39,11 +41,20 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             
+            BRANCH_NAME="sync-worker-$(date +%s)"
+            git checkout -b "$BRANCH_NAME"
+            
             git add "$TARGET_FILE"
             git commit -m "chore: sync $TARGET_FILE from remote source $(date +'%Y-%m-%d %H:%M:%S') [skip ci]"
-            git push
+            git push origin "$BRANCH_NAME"
             
-            echo "Successfully synced and pushed changes."
+            echo "Creating Pull Request..."
+            gh pr create --title "chore: sync $TARGET_FILE from remote source" --body "Automated sync of $TARGET_FILE"
+            
+            echo "Merging Pull Request..."
+            gh pr merge --merge --delete-branch
+            
+            echo "Successfully synced and merged changes."
           else
             echo "No changes detected. Skipping commit."
           fi
