@@ -21,7 +21,7 @@ jobs:
           SOURCE_URL: ${{ secrets.SOURCE_URL }}
         run: |
           # ================= 配置区域 =================
-          TARGET_FILE="_workers.js"
+          TARGET_FILE="_worker.js"
           # ===========================================
 
           if [ -z "$SOURCE_URL" ]; then
