@@ -2,7 +2,7 @@
 
 此仓库包含一个 GitHub Actions 工作流，用于自动监控并同步远程文件到本地仓库。
 
-主要用于定期从指定的 URL 拉取最新的代码或配置（例如 Cloudflare Worker 脚本），并将其保存为根目录下的 `_workers.js`。如果内容发生变化，工作流会自动提交并推送到本仓库。
+主要用于定期从指定的 URL 拉取最新的代码或配置（例如 Cloudflare Worker 脚本），并将其保存为根目录下的 `_worker.js`。如果内容发生变化，工作流会自动提交并推送到本仓库。
 
 ## 功能特性
 
@@ -42,7 +42,7 @@
 
 ### 执行逻辑
 1. 读取 `SOURCE_URL` 环境变量。
-2. 使用 `curl` 下载内容到 `_workers.js`。
+2. 使用 `curl` 下载内容到 `_worker.js`。
 3. 使用 `git status` 检查文件是否有变动。
 4. 如果有变动，以 `github-actions[bot]` 身份提交更改并推送到 `main` 分支。
 
