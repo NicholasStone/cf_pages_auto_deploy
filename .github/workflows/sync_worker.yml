@@ -40,7 +40,7 @@ jobs:
             git config user.email "github-actions[bot]@users.noreply.github.com"
             
             git add "$TARGET_FILE"
-            git commit -m "chore: sync $TARGET_FILE from remote source [skip ci]"
+            git commit -m "chore: sync $TARGET_FILE from remote source $(date +'%Y-%m-%d %H:%M:%S') [skip ci]"
             git push
             
             echo "Successfully synced and pushed changes."
